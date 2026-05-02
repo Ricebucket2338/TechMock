@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 面试助手</title>
+    <link rel="stylesheet" href="styles.css?v=8">
+    <!-- Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <!-- Code highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/es/highlight.min.js"></script>
+    <style>
+    .messages { gap: 10px !important; padding: 12px 16px 8px !important; }
+    .msg-row { gap: 6px !important; }
+    .msg-bubble { padding: 6px 10px !important; line-height: 1.45 !important; font-size: 14px !important; }
+    .msg-bubble.assistant { line-height: 1.45 !important; }
+    .msg-bubble.assistant h1,
+    .msg-bubble.assistant h2,
+    .msg-bubble.assistant h3,
+    .msg-bubble.assistant h4 { margin-top: 6px !important; margin-bottom: 2px !important; line-height: 1.25 !important; }
+    .msg-bubble.assistant h1 { font-size: 1.25em !important; padding-bottom: 3px !important; }
+    .msg-bubble.assistant h2 { font-size: 1.15em !important; padding-bottom: 2px !important; }
+    .msg-bubble.assistant h3 { font-size: 1.08em !important; }
+    .msg-bubble.assistant p { margin-top: 0 !important; margin-bottom: 2px !important; line-height: 1.4 !important; }
+    .msg-bubble.assistant p:last-child { margin-bottom: 0 !important; }
+    .msg-bubble.assistant > :last-child { margin-bottom: 0 !important; }
+    .msg-bubble.assistant br:last-child { display: none !important; }
+    .msg-bubble.assistant p:empty { display: none !important; }
+    .msg-bubble.assistant br:only-child { display: none !important; }
+    .msg-bubble.assistant ul,
+    .msg-bubble.assistant ol { margin-top: 2px !important; margin-bottom: 2px !important; padding-left: 18px !important; }
+    .msg-bubble.assistant li { margin-bottom: 0 !important; line-height: 1.4 !important; }
+    .msg-bubble.assistant li:last-child { margin-bottom: 0 !important; }
+    .msg-bubble.assistant li p { margin-bottom: 0 !important; }
+    .msg-bubble.assistant pre { margin: 3px 0 !important; padding: 5px 8px !important; }
+    .msg-bubble.assistant pre code { line-height: 1.35 !important; }
+    .msg-bubble.assistant blockquote { margin: 3px 0 !important; padding-left: 12px !important; }
+    .msg-bubble.assistant table { margin: 3px 0 !important; }
+    .msg-bubble.assistant table th,
+    .msg-bubble.assistant table td { padding: 4px 8px !important; }
+    .msg-bubble.assistant code { padding: 1px 3px !important; font-size: 0.85em !important; }
+    .msg-bubble.assistant hr { margin: 4px 0 !important; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Top navigation bar -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="nav-brand">AI 面试助手</span>
+            </div>
+            <div class="nav-center">
+                <span class="nav-tab active" data-tab="chat">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    对话
+                </span>
+                <span class="nav-tab" data-tab="interview">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    面试
+                </span>
+                <span class="nav-tab" data-tab="audio">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    复盘
+                </span>
+            </div>
+        </nav>
+
+        <!-- Chat content area -->
+        <div class="content-area" id="chatPage">
+            <!-- Left sidebar: conversation list -->
+            <aside class="sidebar">
+                <div class="sidebar-action">
+                    <button class="new-chat-btn" id="newChatBtn">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        新建对话
+                    </button>
+                </div>
+                <div class="sidebar-list" id="conversationList">
+                    <!-- Conversations will be rendered here -->
+                </div>
+            </aside>
+
+            <!-- Main chat area -->
+            <main class="main">
+                <div class="chat-header">
+                    <span id="chatTitle">新对话</span>
+                </div>
+
+                <!-- Welcome screen -->
+                <div class="welcome" id="welcomeScreen">
+                    <div class="welcome-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h2>你好，有什么我可以帮你的？</h2>
+                    <div class="suggestions">
+                        <div class="suggestion-card" data-text="介绍一下你自己">介绍一下你自己</div>
+                        <div class="suggestion-card" data-text="你能帮我做什么？">你能帮我做什么？</div>
+                    </div>
+                </div>
+
+                <!-- Messages container -->
+                <div class="messages" id="messagesContainer" style="display: none;">
+                    <!-- Messages will be rendered here -->
+                </div>
+
+                <!-- Input area -->
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <div class="input-left">
+                            <div class="tools-btn-wrapper" id="toolsWrapper">
+                                <button class="tools-btn" id="toolsBtn" title="更多选项">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                                        <circle cx="19" cy="12" r="1.5" fill="currentColor"/>
+                                        <circle cx="5" cy="12" r="1.5" fill="currentColor"/>
+                                    </svg>
+                                </button>
+                                <div class="tools-menu" id="toolsMenu">
+                                    <div class="tools-menu-item" id="uploadFileItem">
+                                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <span>上传文件</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <textarea class="message-input" id="messageInput" placeholder="输入你的问题..." rows="1"></textarea>
+                        <div class="input-right">
+                            <div class="mode-selector-wrapper" id="modeWrapper">
+                                <button class="mode-selector-btn" id="modeBtn">
+                                    <span id="currentModeText">流式</span>
+                                    <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <div class="mode-dropdown" id="modeDropdown">
+                                    <div class="dropdown-header">选择对话方式</div>
+                                    <div class="dropdown-item" data-mode="quick">
+                                        <div class="dropdown-item-main">
+                                            <span>快速</span>
+                                        </div>
+                                        <div class="dropdown-item-sub">快速对话</div>
+                                    </div>
+                                    <div class="dropdown-item active" data-mode="stream">
+                                        <div class="dropdown-item-main">
+                                            <span>流式</span>
+                                        </div>
+                                        <div class="dropdown-item-sub">流式对话</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="send-btn" id="sendBtn" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".txt,.md,.markdown" style="display: none;">
+                </div>
+            </main>
+        </div>
+
+        <!-- Interview page (hidden by default) -->
+        <div class="interview-page" id="interviewPage" style="display: none;">
+            <!-- Interview sidebar -->
+            <aside class="sidebar interview-sidebar">
+                <div class="sidebar-action">
+                    <button class="new-interview-btn" id="newInterviewBtn">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        新建面试
+                    </button>
+                </div>
+                <div class="sidebar-list" id="interviewList">
+                    <!-- Interview history will be rendered here -->
+                </div>
+            </aside>
+
+            <!-- Interview main area -->
+            <div class="main interview-main">
+                <!-- Interview config screen -->
+                <div class="interview-config" id="interviewConfig">
+                    <div class="interview-config-header">
+                        <h2>开始模拟面试</h2>
+                        <p>选择面试类型，开始你的面试练习</p>
+                    </div>
+                    <div class="interview-config-form">
+                        <div class="form-group">
+                            <label class="form-label">面试类型</label>
+                            <div class="radio-group">
+                                <label class="radio-option active" data-value="tech">
+                                    <input type="radio" name="interviewType" value="tech" checked>
+                                    <span class="radio-label-text">
+                                        <strong>技术面</strong>
+                                        <span>考察技术基础、项目经验和解决问题的能力</span>
+                                    </span>
+                                </label>
+                                <label class="radio-option" data-value="nontech">
+                                    <input type="radio" name="interviewType" value="nontech">
+                                    <span class="radio-label-text">
+                                        <strong>非技术面</strong>
+                                        <span>考察综合素质、沟通能力和职业规划</span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="start-interview-btn" id="startInterviewBtn">
+                            开始面试
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interview chat area (hidden until interview starts) -->
+                <div class="interview-chat" id="interviewChat" style="display: none;">
+                    <div class="interview-chat-header" id="interviewChatHeader">
+                        <span class="interview-status" id="interviewStatus">面试进行中</span>
+                    </div>
+                    <div class="messages" id="interviewMessages"></div>
+                    <div class="interview-input-area">
+                        <div class="input-wrapper" id="interviewInputWrapper">
+                            <textarea class="message-input" id="interviewMessageInput" placeholder="输入你的回答..." rows="1"></textarea>
+                            <div class="input-right">
+                                <button class="send-btn" id="interviewSendBtn" disabled>
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="interview-actions">
+                            <button class="end-interview-btn" id="endInterviewBtn">结束面试</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Interview report page (hidden until interview ends) -->
+                <div class="interview-report-page" id="interviewReportPage" style="display: none;">
+                    <div class="interview-report-header">
+                        <button class="report-back-btn" id="reportBackBtn" title="返回">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                <path d="M19 12H5M12 5L5 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <h3>面试评估报告</h3>
+                    </div>
+                    <div class="report-body interview-report-body" id="interviewReportBody">
+                        <!-- Report content rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="audio-page" id="audioPage" style="display: none;">
+            <!-- Audio sidebar -->
+            <aside class="sidebar audio-sidebar">
+                <div class="sidebar-action">
+                    <div class="audio-sidebar-header">
+                        <span class="audio-sidebar-title">上传历史</span>
+                        <button class="audio-new-task-btn" id="audioNewTaskBtn" title="新任务">+ 新任务</button>
+                    </div>
+                </div>
+                <div class="sidebar-list" id="audioTaskList">
+                    <!-- Task history will be rendered here -->
+                </div>
+            </aside>
+
+            <!-- Audio main area -->
+            <div class="main audio-main">
+                <!-- Upload view (default) -->
+                <div class="audio-upload-view" id="audioUploadView">
+                    <div class="audio-upload-header">
+                        <h2>上传录音文件</h2>
+                        <p>支持 M4A / MP3 / WAV / FLAC，单文件最大 500MB</p>
+                    </div>
+
+                    <div class="audio-upload-zone" id="audioUploadZone">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span id="audioUploadText">点击选择文件，或拖拽到这里</span>
+                        <span id="audioUploadHint">支持多个文件同时上传</span>
+                    </div>
+                    <input type="file" id="audioFileInput" accept=".m4a,.mp3,.wav,.flac" multiple style="display: none;">
+
+                    <!-- Upload queue -->
+                    <div class="audio-queue" id="audioQueue">
+                        <!-- Upload cards rendered here -->
+                    </div>
+                </div>
+
+                <!-- Task detail view (hidden until a task is selected) -->
+                <div class="audio-task-detail" id="audioTaskDetail" style="display: none;">
+                    <div class="audio-detail-header">
+                        <button class="audio-back-btn" id="audioBackBtn" title="返回上传页面">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                <path d="M19 12H5M12 5L5 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <div class="audio-detail-info">
+                            <h3 id="audioDetailFileName">—</h3>
+                            <span id="audioDetailMeta" class="audio-detail-meta"></span>
+                        </div>
+                    </div>
+                    <div class="audio-tabs" id="audioTabs">
+                        <button class="audio-tab-btn active" data-tab="transcript">转写文本</button>
+                        <button class="audio-tab-btn" data-tab="report">复盘报告</button>
+                    </div>
+                    <div class="audio-tab-content" id="audioTabContent">
+                        <div class="audio-tab-panel active" id="transcriptPanel">
+                            <div class="transcript-body" id="transcriptBody">
+                                <div class="empty-task">暂无转写内容</div>
+                            </div>
+                        </div>
+                        <div class="audio-tab-panel" id="reportPanel">
+                            <div class="report-body" id="reportBody">
+                                <div class="empty-task">暂无复盘报告</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- 结束面试确认弹窗 -->
+    <div class="confirm-modal" id="endInterviewModal">
+        <div class="confirm-dialog">
+            <h3 class="confirm-title">确认结束面试？</h3>
+            <p class="confirm-message">结束后将生成评估报告，无法继续作答。</p>
+            <div class="confirm-actions">
+                <button class="confirm-btn confirm-btn-cancel" id="endInterviewCancelBtn">取消</button>
+                <button class="confirm-btn confirm-btn-confirm" id="endInterviewConfirmBtn">确认结束</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loadingText">处理中，请稍候...</div>
+            <div class="loading-subtext" id="loadingSubtext">后端正在处理，请耐心等待</div>
+        </div>
+    </div>
+
+    </div>
+
+    <script src="app.js?v=7"></script>
+</body>
+</html>
