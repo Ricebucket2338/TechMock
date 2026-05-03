@@ -128,4 +128,5 @@ TechMock/
 
 ## 打赏
 如果项目对你有帮助，欢迎 Star ⭐ 支持，后续持续迭代更新
-<img width="1146" height="1111" alt="f16e9d5533a02974a637fe9dc47cf328" src="https://github.com/user-attachments/assets/cec0178b-1c92-4611-89fc-170c16a737a7" />
+
+<img width="229" height="222" alt="f16e9d5533a02974a637fe9dc47cf328" src="https://github.com/user-attachments/assets/cec0178b-1c92-4611-89fc-170c16a737a7" />
