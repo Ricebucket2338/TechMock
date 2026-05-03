@@ -12,7 +12,7 @@
 
 ![项目截图4](./screenshots/screenshot4.png)
 
-![项目截图5](./screenshots/screenshot.png)
+![项目截图5]<img width="1909" height="827" alt="screenshot5" src="https://github.com/user-attachments/assets/fe8a6b27-0f58-47d6-9a17-76c798fccd44" />
 
 ## 核心功能
 
@@ -125,3 +125,7 @@ TechMock/
 ## License
 
 [MIT](./LICENSE)
+
+## 打赏
+如果项目对你有帮助，欢迎 Star ⭐ 支持，后续持续迭代更新
+<img width="1146" height="1111" alt="f16e9d5533a02974a637fe9dc47cf328" src="https://github.com/user-attachments/assets/cec0178b-1c92-4611-89fc-170c16a737a7" />
