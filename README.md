@@ -12,7 +12,7 @@
 
 ![项目截图4](./screenshots/screenshot4.png)
 
-![项目截图5](./screenshots/screenshot5.png)
+![项目截图5](./screenshots/screenshot.png)
 
 ## 核心功能
 
