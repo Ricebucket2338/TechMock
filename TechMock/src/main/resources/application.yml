@@ -92,16 +92,6 @@ rag:
     rrf-threshold: 0.02
     top-k: 5
 
-# Prometheus 配置
-prometheus:
-  base-url: http://localhost:9090
-  timeout: 10
-  mock-enabled: false
-
-# CLS 云日志服务配置
-cls:
-  mock-enabled: false
-
 # RocketMQ 配置
 rocketmq:
   name-server: 127.0.0.1:9876
