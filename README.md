@@ -12,7 +12,7 @@
 
 ![项目截图4](./screenshots/screenshot4.png)
 
-![项目截图5]<img width="1909" height="827" alt="screenshot5" src="https://github.com/user-attachments/assets/fe8a6b27-0f58-47d6-9a17-76c798fccd44" />
+<img width="1909" height="827" alt="screenshot5" src="https://github.com/user-attachments/assets/fe8a6b27-0f58-47d6-9a17-76c798fccd44" />
 
 ## 核心功能
 
